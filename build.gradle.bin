@@ -1,0 +1,45 @@
+apply plugin: "java"
+
+version '1.0'
+
+sourceCompatibility = JavaVersion.VERSION_16
+
+sourceSets.main.java.srcDirs = ["src"]
+
+repositories{
+    mavenCentral()
+    maven{ url "https://raw.githubusercontent.com/Zelaux/MindustryRepo/master/repository" }
+    maven{ url 'https://www.jitpack.io' }
+}
+
+dependencies{
+    compileOnly "com.github.Akii.Arc:arc-core:v146"
+    compileOnly("com.github.Akii.Mindustry:core:v146")
+    annotationProcessor "com.github.Akii:jabel:93fde537c7"
+}
+
+allprojects{
+    tasks.withType(JavaCompile){
+        options.compilerArgs.addAll(['--release', '8'])
+    }
+}
+
+allprojects{
+    tasks.withType(JavaCompile){
+        if(JavaVersion.current() != JavaVersion.VERSION_1_8){
+            options.compilerArgs.addAll(['--release', '8'])
+        }
+    }
+}
+
+jar{
+    archiveFileName = "${project.archivesBaseName}.jar"
+
+    from{
+        configurations.runtimeClasspath.collect{it.isDirectory() ? it : zipTree(it)}
+    }
+
+    from(rootDir){
+        include "plugin.hjson"
+    }
+}
